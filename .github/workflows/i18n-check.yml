@@ -20,6 +20,9 @@ on:
       - 'locales/**'
       - 'scripts/**'
       - '.github/workflows/i18n-check.yml'
+  workflow_call:   # 允许 deploy-pages.yml 复用本工作流
+      - 'scripts/**'
+      - '.github/workflows/i18n-check.yml'
   workflow_dispatch:
 
 jobs:
