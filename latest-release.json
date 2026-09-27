@@ -1,0 +1,6 @@
+{
+  "version": "unknown",
+  "zipUrl": "",
+  "updatedAt": "",
+  "note": "This file is auto-updated daily by .github/workflows/update-latest-release.yml. If empty, the frontend falls back to direct GitHub API calls."
+}
