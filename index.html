@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmuBox — 安卓模拟器驱动与组件管理工具箱</title>
+<meta name="description" content="EmuBox：安卓端模拟器驱动、转译组件与运行库聚合管理工具。聚合 Turnip/PanVK 驱动源，按设备 GPU 自动匹配，一键下载管理 Winlator / Eden 等模拟器资源。MIT 开源，无广告。">
+<link href="https://fonts.googleapis.cn/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c23;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f7;
+    --muted: #8892a4;
+    --accent: #4f8ef7;
+    --accent2: #7c5af7;
+    --green: #22d47a;
+    --amber: #f7a832;
+    --pill-bg: rgba(79,142,247,0.13);
+    --pill-text: #6faeff;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 64px; }
+  .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .logo-badge {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 20px; color: #fff; flex-shrink: 0;
+  }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: 0.3px; }
+  .sub { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  .tag {
+    display: inline-block; margin-top: 12px; padding: 4px 12px;
+    border-radius: 999px; background: var(--pill-bg); color: var(--pill-text);
+    font-size: 13px; font-weight: 600;
+  }
+  .hero {
+    padding: 28px; border-radius: var(--radius);
+    background: linear-gradient(160deg, rgba(79,142,247,0.14), rgba(124,90,247,0.10)), var(--surface);
+    border: 1px solid var(--border);
+    margin: 28px 0;
+  }
+  .hero p { color: var(--muted); font-size: 15px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 12px; text-decoration: none;
+    font-weight: 700; font-size: 15px; cursor: pointer; border: none;
+    transition: transform 0.15s; font-family: inherit;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #5f9cff; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+  .status {
+    margin-top: 14px; padding: 10px 14px; border-radius: 10px;
+    background: rgba(34,212,122,0.08); border: 1px solid rgba(34,212,122,0.25);
+    color: var(--green); font-size: 13.5px; min-height: 20px; display: none;
+  }
+  .status.err { background: rgba(247,88,88,0.08); border-color: rgba(247,88,88,0.3); color: #ff8a8a; }
+  h2 { font-size: 20px; font-weight: 700; margin: 36px 0 8px; }
+  .h2sub { color: var(--muted); font-size: 13.5px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .card p { color: var(--muted); font-size: 13.5px; }
+  .reslist { display: flex; flex-direction: column; gap: 12px; }
+  .res {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  }
+  .res .rinfo { flex: 1; min-width: 220px; }
+  .res .rname { font-weight: 700; font-size: 15px; }
+  .res .rdesc { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .res .rbtns { display: flex; gap: 8px; }
+  .btn-sm { padding: 8px 14px; font-size: 13.5px; border-radius: 10px; }
+  .badge-note { color: var(--amber); font-size: 13px; margin-top: 10px; }
+  .foot { color: var(--muted); font-size: 12.5px; margin-top: 48px; border-top: 1px solid var(--border); padding-top: 18px; }
+  .foot a { color: var(--pill-text); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-badge">EB</div>
+    <div>
+      <h1>EmuBox</h1>
+      <div class="sub">安卓模拟器驱动 · 组件 · 运行库聚合管理工具箱</div>
+    </div>
+  </div>
+  <span class="tag">独立更名 · 正式签名稳定版 · MIT 开源 · 无广告</span>
+
+  <div class="hero">
+    <p>EmuBox 由 EmuHub-CN 独立更名而来，聚合安卓模拟环境的驱动仓库、转译组件、运行库与模拟器源，按设备 GPU 自动匹配推荐，一键下载管理 Winlator / Eden / Citron 等模拟器资源。完整体验请安装 Android App。</p>
+    <div class="cta">
+      <button class="btn btn-primary" id="btnApk" onclick="downloadApk()">⬇ 下载最新 APK（自动加速）</button>
+      <a class="btn btn-secondary" href="https://github.com/mihsian77/Emubox" target="_blank" rel="noopener">查看 GitHub 仓库</a>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="badge-note">APK 下载自动选择 MirrorHub 最快加速节点转发最新发布文件；GitHub 直连可用时也可直接下载。</div>
+  </div>
+
+  <h2>备用资源下载</h2>
+  <div class="h2sub">本页即主项目的备用下载站：即使 Android App 仓库暂时不可用，以下资源仍可通过本页直接获取（自动走 MirrorHub 最快节点加速）。</div>
+  <div class="reslist" id="resList">
+    <div class="res">
+      <div class="rinfo"><div class="rname">EmuBox APK（最新正式版）</div><div class="rdesc">安卓模拟器驱动/组件/运行库管理工具箱 · 独立更名 · 正式签名</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="downloadApk()">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/mihsian77/Emubox/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">Turnip 通用驱动（Adreno）</div><div class="rdesc">MrPurple666 / purple-turnip — 热门第三方 Turnip 编译，A6xx/A7xx/A8xx 统一支持</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('MrPurple666','purple-turnip')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/MrPurple666/purple-turnip/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">PanVK kbase 通用（Mali）</div><div class="rdesc">LukeValen / panvk-kbase-android — 通用 kbase PanVK，Switch 模拟安全版（Eden/Lemon 双包）</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('LukeValen','panvk-kbase-android')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/LukeValen/panvk-kbase-android/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">PanVK 多型号（Mali）</div><div class="rdesc">MineGraph-bilibili / panvk-Android — Mesa 26.3 PanVK，G610/G615/G710/G715/G720</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('MineGraph-bilibili','panvk-Android')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/MineGraph-bilibili/panvk-Android/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">panDXVK（Mali 纹理转码）</div><div class="rdesc">isygold / panDXVK — PanVK 专用 DXVK，BC→ASTC 纹理转码，Mali 跑 PC 游戏必需</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('isygold','panDXVK')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/isygold/panDXVK/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">DXVK（转译组件）</div><div class="rdesc">doitsujin / dxvk — DirectX 9/10/11 → Vulkan 转译层</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('doitsujin','dxvk')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/doitsujin/dxvk/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">Box64（转译组件）</div><div class="rdesc">ptitSeb / box64 — x86_64 模拟/转译，Winlator 运行 PC 游戏核心</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('ptitSeb','box64')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/ptitSeb/box64/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+    <div class="res">
+      <div class="rinfo"><div class="rname">VKD3D-Proton（转译组件）</div><div class="rdesc">HansKristian-Work / vkd3d-proton — DirectX 12 → Vulkan 转译层</div></div>
+      <div class="rbtns"><button class="btn btn-primary btn-sm" onclick="dl('HansKristian-Work','vkd3d-proton')">加速下载</button><a class="btn btn-secondary btn-sm" href="https://github.com/HansKristian-Work/vkd3d-proton/releases" target="_blank" rel="noopener">直连</a></div>
+    </div>
+  </div>
+
+  <h2>已完善的基础功能</h2>
+  <div class="grid">
+    <div class="card"><h3>🔧 驱动专区</h3><p>聚合 48 条驱动源记录（Turnip / PanVK / Xclipse / 厂商系统），按 GPU 架构与成熟度分类，多来源自由切换。</p></div>
+    <div class="card"><h3>🧩 组件专区</h3><p>Wine / Proton、Box64 / FEXCore、DXVK / VKD3D-Proton 等转译组件，聚合多个上游目录，一键下载。</p></div>
+    <div class="card"><h3>📦 运行库专区</h3><p>VC++ 运行库、.NET、解码器、字体、DirectX 等 Winlator 常用依赖，附中文用途说明。</p></div>
+    <div class="card"><h3>📱 按设备匹配</h3><p>自动识别 GPU 型号与 Adreno / Mali 代际，驱动按匹配度排序推荐，可在设置关闭查看全部。</p></div>
+    <div class="card"><h3>🚀 镜像加速</h3><p>接入 MirrorHub 加速节点，自动测速选优，支持手动切换或直连。</p></div>
+    <div class="card"><h3>💾 下载管理</h3><p>断点续传、按类型分目录存放、扫描本地已有文件、查看包内 meta.json 信息。</p></div>
+    <div class="card"><h3>🕹 模拟器聚合</h3><p>收录 Winlator / Eden / Citron / GameHub / Sumi 等官方源，含稳定版与官方每夜构建源。</p></div>
+    <div class="card"><h3>🌐 中英双语</h3><p>简体中文 / English，设置内一键切换。</p></div>
+  </div>
+
+  <h2>为什么选择 EmuBox</h2>
+  <div class="grid">
+    <div class="card"><h3>一站式资源管理</h3><p>驱动、转译组件、运行库、模拟器源整合在单个 App，同类工具大多只单独管理模拟器。</p></div>
+    <div class="card"><h3>GPU 智能筛选</h3><p>自动识别 SoC GPU，过滤不匹配驱动，减少无效查找（骁龙用户可隐藏 Mali 分区）。</p></div>
+    <div class="card"><h3>信息透明</h3><p>多源切换展示仓库更新时间与 Star，来源可追溯。</p></div>
+    <div class="card"><h3>开源可审计</h3><p>MIT 协议，正式签名稳定版，无广告，无账号要求。</p></div>
+  </div>
+
+  <div class="foot">
+    <p>EmuBox 脱胎于 <a href="https://github.com/Rodrig02005/EmuHub-APP" target="_blank" rel="noopener">Rodrig02005/EmuHub-APP</a>（MIT 协议）与 NotZeetaa/EmuHub，本项目在其基础上独立更名并持续维护。加速节点由 <a href="https://github.com/mihsian77/MirrorHub" target="_blank" rel="noopener">MirrorHub</a> 提供（MIT）。所有驱动与组件的版权归各自作者所有。</p>
+  </div>
+</div>
+
+<script>
+var nodesCache = null;
+function setStatus(msg, err) {
+  var el = document.getElementById('status');
+  el.style.display = 'block';
+  el.className = 'status' + (err ? ' err' : '');
+  el.textContent = msg;
+}
+async function getFastestNode() {
+  if (nodesCache) return nodesCache;
+  try {
+    var r = await fetch('https://raw.githubusercontent.com/mihsian77/MirrorHub/main/active-nodes.json');
+    var d = await r.json();
+    var list = (d.nodes || []).filter(function (n) { return n && n.domain; });
+    list.sort(function (a, b) { return (a.latency_ms || 99999) - (b.latency_ms || 99999); });
+    nodesCache = list[0] || null;
+  } catch (e) { nodesCache = null; }
+  return nodesCache;
+}
+function proxyUrl(node, target) {
+  return 'https://' + node.domain + '/' + target;
+}
+async function downloadApk() {
+  var btn = document.getElementById('btnApk');
+  btn.disabled = true;
+  setStatus('正在获取最新发布版本…');
+  var direct = null;
+  try {
+    var r = await fetch('https://api.github.com/repos/mihsian77/Emubox/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
+    var d = await r.json();
+    var a = (d.assets || []).filter(function (x) { return /\.apk$/i.test(x.name); })[0];
+    if (a && a.browser_download_url) direct = a.browser_download_url;
+  } catch (e) {}
+  if (!direct) direct = 'https://github.com/mihsian77/Emubox/releases/latest';
+  setStatus('正在选择 MirrorHub 最快加速节点…');
+  var node = await getFastestNode();
+  if (node && /^https:\/\/github\.com\//.test(direct)) {
+    setStatus('已选择最快节点「' + node.name + '」（' + (node.latency_ms || '?') + 'ms），正在打开下载…');
+    window.open(proxyUrl(node, direct), '_blank');
+  } else {
+    setStatus('加速节点暂不可用，已改用 GitHub 直连下载。');
+    window.open(direct, '_blank');
+  }
+  btn.disabled = false;
+  setTimeout(function () { document.getElementById('status').style.display = 'none'; }, 6000);
+}
+async function dl(owner, repo) {
+  setStatus('正在通过 MirrorHub 最快节点打开 ' + owner + '/' + repo + ' 最新版本…');
+  var node = await getFastestNode();
+  var target = 'https://github.com/' + owner + '/' + repo + '/releases/latest';
+  if (node) {
+    setStatus('已选择最快节点「' + node.name + '」，正在打开最新版本页…');
+    window.open(proxyUrl(node, target), '_blank');
+  } else {
+    setStatus('加速节点暂不可用，已改用 GitHub 直连。');
+    window.open(target, '_blank');
+  }
+  setTimeout(function () { document.getElementById('status').style.display = 'none'; }, 5000);
+}
+</script>
+</body>
+</html>
